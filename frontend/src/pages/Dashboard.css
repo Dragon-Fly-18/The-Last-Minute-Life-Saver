@@ -1,0 +1,176 @@
+.dashboard-container {
+  min-height: 100vh;
+  width: 100vw;
+  background-image: url('https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2564&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: 'Outfit', sans-serif;
+  color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.glass-panel-dark {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 40px;
+  margin: 20px;
+  border-radius: 16px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  font-size: 1.5rem;
+}
+
+.nav-brand h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: linear-gradient(to right, #fff, #d4a5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 59, 48, 0.2);
+  border-color: rgba(255, 59, 48, 0.5);
+  color: #ff8b8b;
+}
+
+.dashboard-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+.dashboard-header {
+  margin: 40px 0;
+  text-align: left;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  margin: 0 0 8px 0;
+}
+
+.dashboard-header p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+.grid-item {
+  padding: 24px;
+}
+
+.tasks-section {
+  grid-column: span 5;
+}
+
+.ai-section {
+  grid-column: span 7;
+}
+
+.list-section {
+  grid-column: span 12;
+}
+
+.section-title {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #d4a5ff;
+}
+
+/* Style the inner components temporarily until we refactor them */
+.tasks-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tasks-section input, .tasks-section select {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-family: inherit;
+  outline: none;
+}
+
+.tasks-section button, .ai-section button {
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #aa3bff 0%, #8224e3 100%);
+  color: white;
+  border: none;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ai-section p {
+  margin-top: 20px;
+  line-height: 1.6;
+  background: rgba(0,0,0,0.2);
+  padding: 20px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+}
+
+.list-section > div > div {
+  background: rgba(0,0,0,0.2);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-section h3 {
+  margin: 0 0 8px 0;
+}
+
+@media (max-width: 900px) {
+  .tasks-section, .ai-section {
+    grid-column: span 12;
+  }
+}

@@ -1,0 +1,51 @@
+import { 
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc
+} from "firebase/firestore";
+
+import db from "./firebase";
+
+
+export const addTask = async(task)=>{
+
+await addDoc(
+collection(db,"tasks"),
+task
+);
+
+};
+
+
+
+export const getTasks = async()=>{
+
+
+const snapshot =
+await getDocs(
+collection(db,"tasks")
+);
+
+
+return snapshot.docs.map(item=>({
+
+id:item.id,
+...item.data()
+
+}));
+
+};
+
+
+
+export const deleteTask = async(id)=>{
+
+
+await deleteDoc(
+doc(db,"tasks",id)
+);
+
+
+};
