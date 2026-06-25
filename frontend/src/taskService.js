@@ -3,6 +3,7 @@ collection,
 addDoc,
 getDocs,
 deleteDoc,
+updateDoc,
 doc
 } from "firebase/firestore";
 
@@ -47,5 +48,15 @@ await deleteDoc(
 doc(db,"tasks",id)
 );
 
+
+};
+
+
+export const updateTask = async(id, data)=>{
+
+await updateDoc(
+doc(db,"tasks",id),
+data
+);
 
 };

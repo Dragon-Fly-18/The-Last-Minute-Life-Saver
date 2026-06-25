@@ -1,0 +1,357 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Reset / Root ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Page wrapper ─────────────────────────────────────────── */
+.lm-root {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  width: 100vw;
+  background: #09090f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+}
+
+/* ── Ambient glow blobs ───────────────────────────────────── */
+.lm-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lm-blob-tl {
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.12) 0%, transparent 70%);
+  top: -100px;
+  left: -100px;
+}
+
+.lm-blob-br {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(124, 77, 255, 0.1) 0%, transparent 70%);
+  bottom: -80px;
+  right: -80px;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.lm-card {
+  position: relative;
+  z-index: 1;
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 44px 40px 36px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.04),
+    0 32px 80px rgba(0, 0, 0, 0.65),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: lm-fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes lm-fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+.lm-logo {
+  margin-bottom: 14px;
+  filter: drop-shadow(0 0 18px rgba(124, 77, 255, 0.5));
+  transition: filter 0.3s ease;
+}
+
+.lm-logo:hover {
+  filter: drop-shadow(0 0 28px rgba(79, 195, 247, 0.7));
+}
+
+/* ── Brand ────────────────────────────────────────────────── */
+.lm-brand {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.lm-brand-ai {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+  margin-left: 1px;
+}
+
+.lm-tagline {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin-bottom: 30px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Error ────────────────────────────────────────────────── */
+.lm-error {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  font-size: 0.8rem;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  text-align: center;
+  animation: lm-shake 0.35s ease;
+}
+
+@keyframes lm-shake {
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-6px); }
+  75%       { transform: translateX(6px); }
+}
+
+/* ── Form ─────────────────────────────────────────────────── */
+.lm-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Field ────────────────────────────────────────────────── */
+.lm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+}
+
+.lm-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.lm-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Input wrapper ────────────────────────────────────────── */
+.lm-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #18181f;
+  border: 1px solid #2a2a35;
+  border-radius: 10px;
+  padding: 0 14px;
+  gap: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lm-input-wrap.lm-focused {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+.lm-icon {
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.lm-input-wrap.lm-focused .lm-icon {
+  color: #22c55e;
+}
+
+.lm-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f3f4f6;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  padding: 13px 0;
+}
+
+.lm-input::placeholder {
+  color: #4b5563;
+}
+
+/* ── Eye button ───────────────────────────────────────────── */
+.lm-eye {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.lm-eye:hover {
+  color: #9ca3af;
+}
+
+/* ── Forgot password ──────────────────────────────────────── */
+.lm-forgot {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: #6b7280;
+  font-family: 'Inter', sans-serif;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.lm-forgot:hover {
+  color: #9ca3af;
+}
+
+/* ── Primary button ───────────────────────────────────────── */
+.lm-btn-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(34, 197, 94, 0.35);
+  letter-spacing: 0.01em;
+}
+
+.lm-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 6px 28px rgba(34, 197, 94, 0.5);
+  transform: translateY(-1px);
+}
+
+.lm-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.lm-btn-primary:disabled,
+.lm-btn-primary.lm-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ── Divider ──────────────────────────────────────────────── */
+.lm-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 22px 0 14px;
+}
+
+.lm-divider-line {
+  flex: 1;
+  height: 1px;
+  background: #1f2028;
+}
+
+.lm-divider-text {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #4b5563;
+  white-space: nowrap;
+}
+
+/* ── Demo button ──────────────────────────────────────────── */
+.lm-btn-demo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px;
+  background: #18181f;
+  border: 1px solid #2a2a35;
+  border-radius: 10px;
+  color: #d1d5db;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.lm-btn-demo:hover {
+  background: #1e1e28;
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #f3f4f6;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.1);
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+.lm-footer {
+  margin-top: 20px;
+  font-size: 0.82rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.lm-signup-link {
+  color: #22c55e;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.lm-signup-link:hover {
+  color: #4ade80;
+  text-decoration: underline;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .lm-card {
+    padding: 36px 24px 28px;
+  }
+
+  .lm-brand {
+    font-size: 1.7rem;
+  }
+}
