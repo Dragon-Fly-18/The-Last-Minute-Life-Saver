@@ -4,7 +4,10 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from google.auth.exceptions import RefreshError
+from googleapiclient.errors import HttpError
 from gemini import ask_gemini, ask_gemini_json
+from calendar_service import create_event
 
 
 app = FastAPI()
@@ -27,6 +30,12 @@ class TaskRequest(BaseModel):
 class PredictRequest(BaseModel):
     task: str
     deadline: Optional[str] = None
+
+
+class CalendarRequest(BaseModel):
+    access_token: str
+    title: str
+    date: str
 
 
 # Test backend
@@ -158,3 +167,30 @@ Example:
         return result
     except json.JSONDecodeError:
         return {"error": "Failed to parse AI response"}
+
+
+# Calendar
+@app.post("/calendar")
+def add_calendar_event(data: CalendarRequest):
+    try:
+        # Clean the token in case it was pasted with quotes or "Bearer " in docs
+        token = data.access_token.strip().strip('"').strip("'")
+        if token.lower().startswith("bearer "):
+            token = token[7:].strip()
+
+        event = create_event(
+            token,
+            data.title,
+            data.date
+        )
+
+        return {
+            "message": "Event created successfully",
+            "event": event
+        }
+    except RefreshError:
+        return {"error": "Invalid or expired access token. Please authenticate again. Ensure you are using the Google Calendar Access Token, not a Firebase ID token."}
+    except HttpError as e:
+        return {"error": f"Google Calendar API Error: {e.reason}"}
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {str(e)}"}

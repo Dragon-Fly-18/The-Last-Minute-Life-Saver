@@ -1,4 +1,5 @@
 import { deleteTask } from "../taskService";
+import CalendarSync from "./calendar";
 
 /* ── Priority color map ─────────────────────────────── */
 const PRIORITY_COLORS = {
@@ -69,10 +70,25 @@ function TaskCard({ task, onDelete }) {
         </div>
       </div>
 
-      {/* Delete */}
-      <button className="tc-delete-btn" onClick={handleDelete} title="Delete task">
-        <TrashIcon />
-      </button>
+      {/* Actions */}
+      <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center', marginTop: '15px' }}>
+        <CalendarSync taskTitle={task.title} taskDate={task.deadline || new Date().toISOString()} />
+        <button className="tc-delete-btn" onClick={handleDelete} title="Delete task" style={{
+            backgroundColor: '#ff4d4d',
+            color: 'white',
+            padding: '8px 16px',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontWeight: 'bold',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        }}>
+          <TrashIcon /> Delete
+        </button>
+      </div>
     </div>
   );
 }

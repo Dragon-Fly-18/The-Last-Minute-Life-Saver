@@ -102,10 +102,10 @@ Completed:
 - Gemini API connection
 - AI task planner
 - Smart priority prediction
+- AI Auto Task Breakdown
+- Calendar integration
 
 
 Future Features:
-- AI Auto Task Breakdown
-- Calendar integration
 - Habit tracking
 - Voice assistant
