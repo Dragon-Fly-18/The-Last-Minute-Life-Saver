@@ -201,21 +201,79 @@ from productivity import calculate_productivity_score
 
 class ProductivityRequest(BaseModel):
     tasks: list
+    habits: Optional[list] = None
 
 @app.post("/productivity")
 def get_productivity_analysis(data: ProductivityRequest):
     stats = calculate_productivity_score(data.tasks)
-    
+
+    # Build habit context for the AI prompt
+    habits = data.habits or []
+    total_habits = len(habits)
+    active_habits = 0
+    streak_days = 0
+
+    if habits:
+        from datetime import datetime, timedelta
+
+        today = datetime.now().date()
+        # Count habits that have at least one completion this week
+        monday = today - timedelta(days=today.weekday())
+        for habit in habits:
+            completed_days = habit.get("completedDays", {})
+            for date_str, is_done in completed_days.items():
+                if is_done:
+                    try:
+                        d = datetime.strptime(date_str, "%Y-%m-%d").date()
+                        if monday <= d <= today:
+                            active_habits += 1
+                            break
+                    except ValueError:
+                        pass
+
+        # Calculate streak: consecutive days (backwards from today) with any completion
+        all_completed_dates = set()
+        for habit in habits:
+            for date_str, is_done in habit.get("completedDays", {}).items():
+                if is_done:
+                    all_completed_dates.add(date_str)
+        # Also count task completion dates
+        for task in data.tasks:
+            if str(task.get("status", "")).strip().lower() == "completed" and task.get("completedAt"):
+                try:
+                    d = datetime.fromisoformat(task["completedAt"].rstrip("Z").split(".")[0])
+                    all_completed_dates.add(d.strftime("%Y-%m-%d"))
+                except (ValueError, AttributeError):
+                    pass
+
+        check = today
+        while check.strftime("%Y-%m-%d") in all_completed_dates:
+            streak_days += 1
+            check = check - timedelta(days=1)
+        # If today has no completions yet, check from yesterday
+        if streak_days == 0:
+            check = today - timedelta(days=1)
+            while check.strftime("%Y-%m-%d") in all_completed_dates:
+                streak_days += 1
+                check = check - timedelta(days=1)
+
+    habit_context = ""
+    if total_habits > 0:
+        habit_context = f"""
+- Total Habits Tracked: {total_habits}
+- Active Habits This Week: {active_habits}/{total_habits}
+- Current Productivity Streak: {streak_days} day(s)"""
+
     # Generate quick personalized AI coaching tip from Gemini
     prompt = f"""You are a helpful and direct AI productivity coach. 
 Analyze the user's current task stats:
 - Productivity Score: {stats['score']}%
 - Completion Rate: {stats['completion_rate']}% ({stats['completed_tasks']}/{stats['total_tasks']} tasks completed)
 - High Priority Pending Tasks: {stats['high_priority_pending']}
-- Overdue Tasks: {stats['overdue_tasks']}
+- Overdue Tasks: {stats['overdue_tasks']}{habit_context}
 
 Write a single-sentence, highly actionable and direct piece of advice/encouragement (under 25 words).
-Focus on what they should do next (e.g. tackle high priority tasks, address overdue ones, or celebrate if they are doing great).
+Focus on what they should do next (e.g. tackle high priority tasks, address overdue ones, maintain their habit streak, or celebrate if they are doing great).
 Do not be generic. Keep it short."""
 
     try:
@@ -231,3 +289,15 @@ Do not be generic. Keep it short."""
         "stats": stats,
         "ai_tip": ai_tip
     }
+
+
+# Smart Reminder System
+from remainder_service import get_reminders_from_tasks
+
+class RemindersRequest(BaseModel):
+    tasks: list
+    client_date: Optional[str] = None
+
+@app.post("/reminders")
+def check_tasks_reminders(data: RemindersRequest):
+    return get_reminders_from_tasks(data.tasks, data.client_date)

@@ -8,6 +8,9 @@ import { deleteTask, updateTask } from "../taskService";
 import CalendarSync from "../components/calendar";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../components/Notification";
+import TaskCard from "../components/Taskcard";
+import HabitTracker from "../components/HabitTracker";
 import "./Dashboard.css";
 
 /* ── Productivity score (mirrors backend/productivity.py) ── */
@@ -237,6 +240,7 @@ function Dashboard() {
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tasks, setTasks] = useState([]);
+  const [habits, setHabits] = useState([]);
   const [productivity, setProductivity] = useState({
     score: 0,
     stats: {
@@ -264,9 +268,19 @@ function Dashboard() {
       setTasks(data);
     });
 
+    // Setup real-time listener for habits
+    const unsubscribeHabits = onSnapshot(collection(db, "habits"), (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setHabits(data);
+    });
+
     return () => {
       clearInterval(timer);
       unsubscribe();
+      unsubscribeHabits();
     };
   }, []);
 
@@ -286,7 +300,7 @@ function Dashboard() {
         const response = await fetch("http://127.0.0.1:8000/productivity", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tasks }),
+          body: JSON.stringify({ tasks, habits }),
         });
         const result = await response.json();
         if (result?.ai_tip?.trim()) {
@@ -305,7 +319,7 @@ function Dashboard() {
     };
 
     fetchAiTip();
-  }, [tasks]);
+  }, [tasks, habits]);
 
   const hasCompletedTasks = productivity.stats.completed_tasks > 0;
   const displayScore = hasCompletedTasks ? productivity.score : 0;
@@ -313,7 +327,13 @@ function Dashboard() {
   const handleToggleStatus = async (id, currentStatus) => {
     const nextStatus = currentStatus === "Completed" ? "Pending" : "Completed";
     try {
-      await updateTask(id, { status: nextStatus });
+      const updateData = { status: nextStatus };
+      if (nextStatus === "Completed") {
+        updateData.completedAt = new Date().toISOString();
+      } else {
+        updateData.completedAt = null;
+      }
+      await updateTask(id, updateData);
     } catch (error) {
       console.error("Error updating task status:", error);
     }
@@ -384,6 +404,8 @@ function Dashboard() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <NotificationBell tasks={tasks} />
+
           <button
             className="db-theme-toggle-btn"
             onClick={toggleTheme}
@@ -555,6 +577,25 @@ function Dashboard() {
             </div>
           </div>
 
+          {/* Habit Tracker */}
+          <div className="db-card db-card--habits">
+            <div className="db-card-shimmer" />
+            <div className="db-card-header">
+              <span className="db-card-icon db-card-icon--cyan">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z" />
+                </svg>
+              </span>
+              <div>
+                <h3 className="db-card-title">Habit Tracking</h3>
+                <p className="db-card-sub">Form positive routines and maintain your streak</p>
+              </div>
+            </div>
+            <div className="db-card-body">
+              <HabitTracker habits={habits} tasks={tasks} />
+            </div>
+          </div>
+
           {/* Task List */}
           <div className="db-card db-card--list">
             <div className="db-card-shimmer" />
@@ -598,48 +639,14 @@ function Dashboard() {
                     <p>No tasks found. Add a new task to get started!</p>
                   </div>
                 ) : (
-                  filteredTasks.map((task) => {
-                    const isCompleted = (task.status || "Pending").toLowerCase() === "completed";
-                    return (
-                      <div key={task.id} className={`task-row-card ${isCompleted ? "completed" : ""}`}>
-                        <div className="task-row-left">
-                          <label className="checkbox-container">
-                            <input
-                              type="checkbox"
-                              checked={isCompleted}
-                              onChange={() => handleToggleStatus(task.id, task.status || "Pending")}
-                            />
-                            <span className="checkmark"></span>
-                          </label>
-                          <div className="task-info">
-                            <h4 className="task-title-text">{task.title}</h4>
-                            <div className="task-meta">
-                              {task.deadline && (
-                                <span className="task-meta-item">
-                                  📅 {task.deadline}
-                                </span>
-                              )}
-                              {task.priority && (
-                                <span className={`task-priority-tag ${task.priority.toLowerCase()}`}>
-                                  {task.priority}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="task-row-actions">
-                          <CalendarSync taskTitle={task.title} taskDate={task.deadline || new Date().toISOString()} />
-                          <button
-                            className="tc-delete-btn"
-                            onClick={() => handleDeleteTask(task.id)}
-                            title="Delete task"
-                          >
-                            <TrashIcon />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })
+                  filteredTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onDelete={handleDeleteTask}
+                      onToggleStatus={handleToggleStatus}
+                    />
+                  ))
                 )}
               </div>
             </div>

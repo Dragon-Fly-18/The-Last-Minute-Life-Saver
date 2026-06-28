@@ -105,7 +105,7 @@ Completed:
 - AI Auto Task Breakdown
 - Calendar integration
 - AI Productivity Score
-
+- Notification Reminder
 
 Future Features:
 - Habit tracking

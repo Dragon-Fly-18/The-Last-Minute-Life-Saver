@@ -1,34 +1,75 @@
 import { deleteTask } from "../taskService";
 import CalendarSync from "./calendar";
 
-/* ── Priority color map ─────────────────────────────── */
-const PRIORITY_COLORS = {
-  High:   { bg: "rgba(255, 59, 48, 0.15)", border: "rgba(255, 59, 48, 0.4)",  text: "#ff6b6b" },
-  Medium: { bg: "rgba(255, 204, 0, 0.12)",  border: "rgba(255, 204, 0, 0.35)", text: "#ffd43b" },
-  Low:    { bg: "rgba(52, 199, 89, 0.12)",  border: "rgba(52, 199, 89, 0.35)", text: "#69db7c" },
-};
-
 /* ── Icons ───────────────────────────────────────────── */
 const TrashIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 6 5 6 21 6" />
     <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
-    <path d="M10 11v6" /><path d="M14 11v6" />
+    <line x1="10" y1="11" x2="10" y2="17" />
+    <line x1="14" y1="11" x2="14" y2="17" />
   </svg>
 );
 
-const ClockIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-);
+/* ── Deadline Helpers ─────────────────────────────────── */
+function parseDeadline(deadlineStr) {
+  if (!deadlineStr || typeof deadlineStr !== "string") return null;
+  const s = deadlineStr.trim();
+  if (!s) return null;
+
+  if (s.includes("T")) {
+    try {
+      const clean = s.replace(/Z$/, "").split(".")[0];
+      const d = new Date(clean);
+      return Number.isNaN(d.getTime()) ? null : d;
+    } catch {
+      return null;
+    }
+  }
+
+  const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const d = new Date(`${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}T00:00:00`);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  const dmyMatch = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (dmyMatch) {
+    const [, day, month, year] = dmyMatch;
+    const d = new Date(`${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T00:00:00`);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+const checkDeadlineStatus = (deadlineStr) => {
+  if (!deadlineStr) return null;
+  const dt = parseDeadline(deadlineStr);
+  if (!dt) return null;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const taskDate = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+
+  if (taskDate.getTime() === today.getTime()) {
+    return "today";
+  } else if (taskDate.getTime() === tomorrow.getTime()) {
+    return "tomorrow";
+  }
+  return null;
+};
 
 /* ── Component ───────────────────────────────────────── */
-function TaskCard({ task, onDelete }) {
-  const colors = PRIORITY_COLORS[task.priority] || PRIORITY_COLORS.Medium;
+function TaskCard({ task, onDelete, onToggleStatus }) {
+  const isCompleted = (task.status || "Pending").toLowerCase() === "completed";
+  const deadlineAlert = !isCompleted ? checkDeadlineStatus(task.deadline) : null;
 
   const handleDelete = async () => {
     try {
@@ -40,53 +81,62 @@ function TaskCard({ task, onDelete }) {
   };
 
   return (
-    <div className="tc-card">
-      {/* Left section */}
-      <div className="tc-info">
-        <h4 className="tc-title">{task.title}</h4>
+    <div
+      className={`task-row-card ${isCompleted ? "completed" : ""} ${
+        deadlineAlert ? `due-${deadlineAlert}` : ""
+      }`}
+    >
+      {/* Left side: Checkbox & Meta Info */}
+      <div className="task-row-left">
+        <label className="checkbox-container">
+          <input
+            type="checkbox"
+            checked={isCompleted}
+            onChange={() => onToggleStatus(task.id, task.status || "Pending")}
+          />
+          <span className="checkmark"></span>
+        </label>
+        
+        <div className="task-info">
+          <h4 className="task-title-text">{task.title}</h4>
+          
+          <div className="task-meta">
+            {task.deadline && (
+              <span className="task-meta-item">
+                📅 {task.deadline}
+              </span>
+            )}
+            
+            {task.priority && (
+              <span className={`task-priority-tag ${task.priority.toLowerCase()}`}>
+                {task.priority}
+              </span>
+            )}
 
-        <div className="tc-meta">
-          {task.deadline && (
-            <span className="tc-deadline">
-              <ClockIcon />
-              {task.deadline}
-            </span>
-          )}
-
-          <span
-            className="tc-priority-badge"
-            style={{
-              background: colors.bg,
-              borderColor: colors.border,
-              color: colors.text,
-            }}
-          >
-            {task.priority || "—"}
-          </span>
-
-          <span className={`tc-status tc-status--${(task.status || "Pending").toLowerCase()}`}>
-            {task.status || "Pending"}
-          </span>
+            {/* Smart warning badges */}
+            {deadlineAlert === "today" && (
+              <span className="task-alert-tag due-today-tag">
+                🔥 Due Today
+              </span>
+            )}
+            {deadlineAlert === "tomorrow" && (
+              <span className="task-alert-tag due-tomorrow-tag">
+                ⏰ Due Tomorrow
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Actions */}
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '10px', alignItems: 'center', marginTop: '15px' }}>
+      {/* Right side: Actions */}
+      <div className="task-row-actions">
         <CalendarSync taskTitle={task.title} taskDate={task.deadline || new Date().toISOString()} />
-        <button className="tc-delete-btn" onClick={handleDelete} title="Delete task" style={{
-            backgroundColor: '#ff4d4d',
-            color: 'white',
-            padding: '8px 16px',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontWeight: 'bold',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-        }}>
-          <TrashIcon /> Delete
+        <button
+          className="tc-delete-btn"
+          onClick={handleDelete}
+          title="Delete task"
+        >
+          <TrashIcon />
         </button>
       </div>
     </div>
