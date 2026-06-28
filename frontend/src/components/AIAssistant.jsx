@@ -206,7 +206,7 @@ function AIAssistant() {
         </button>
 
         <button
-          className={`ai-predict-btn${breakdownLoading ? " ai-predict-btn--loading" : ""}`}
+          className={`ai-breakdown-btn${breakdownLoading ? " ai-breakdown-btn--loading" : ""}`}
           onClick={getTaskBreakdown}
           disabled={breakdownLoading || !task.trim()}
         >

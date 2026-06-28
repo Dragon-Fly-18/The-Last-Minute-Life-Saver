@@ -4,13 +4,13 @@ import { auth } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 
-/* ── SVG Icons ───────────────────────────────────────────── */
+/* ── SVG Icons (updated for Neomorphism palette) ──────────── */
 const DiamondIcon = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="36" height="36" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="dGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#4fc3f7" />
-        <stop offset="50%" stopColor="#7c4dff" />
+        <stop offset="0%" stopColor="#7c4dff" />
+        <stop offset="50%" stopColor="#4fc3f7" />
         <stop offset="100%" stopColor="#e040fb" />
       </linearGradient>
     </defs>
@@ -94,21 +94,21 @@ export default function Login() {
 
   return (
     <div className="lm-root">
-      {/* Ambient glow blobs */}
+      {/* Ambient glow orbs */}
       <div className="lm-blob lm-blob-tl" />
       <div className="lm-blob lm-blob-br" />
 
       <div className="lm-card">
-        {/* Logo */}
+        {/* Neomorphic logo container */}
         <div className="lm-logo">
           <DiamondIcon />
         </div>
 
         {/* Brand */}
         <h1 className="lm-brand">
-          Malak<span className="lm-brand-ai">AI</span>
+          LMLS <span className="lm-brand-ai">AI</span>
         </h1>
-        <p className="lm-tagline">Secure access to your intelligent wealth platform.</p>
+        <p className="lm-tagline">Secure access to your intelligent productivity platform.</p>
 
         {/* Error */}
         {error && <div className="lm-error">{error}</div>}
@@ -179,14 +179,14 @@ export default function Login() {
         </form>
 
         {/* Divider */}
-        <div className="lm-divider">
+        {/* <div className="lm-divider">
           <span className="lm-divider-line" />
           <span className="lm-divider-text">OR TEST PREVIEW</span>
           <span className="lm-divider-line" />
-        </div>
+        </div> */}
 
         {/* Demo Account */}
-        <button
+        {/* <button
           id="lm-demo-btn"
           type="button"
           className="lm-btn-demo"
@@ -194,7 +194,7 @@ export default function Login() {
         >
           <DemoCheckIcon />
           Use Demo Account (Alex Morgan)
-        </button>
+        </button> */}
 
         {/* Footer */}
         <p className="lm-footer">

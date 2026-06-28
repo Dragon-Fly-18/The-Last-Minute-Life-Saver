@@ -105,7 +105,7 @@ export default function Signup() {
 
         {/* Brand */}
         <h1 className="lm-brand">
-          Malak<span className="lm-brand-ai">AI</span>
+          LMLS <span className="lm-brand-ai">AI</span>
         </h1>
         <p className="lm-tagline">Create your intelligent wealth platform account.</p>
 

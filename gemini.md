@@ -104,8 +104,21 @@ Completed:
 - Smart priority prediction
 - AI Auto Task Breakdown
 - Calendar integration
+- AI Productivity Score
 
 
 Future Features:
 - Habit tracking
 - Voice assistant
+
+UI Styles:
+1️⃣ Skeuomorphism
+2️⃣ Neomorphism
+3️⃣ Glassmorphism
+4️⃣ Claymorphism
+5️⃣ Minimalism
+6️⃣ Maximalism
+7️⃣ Brutalism
+8️⃣ Liquid Glass
+9️⃣ Bento Grid
+🔟 Spatial UI

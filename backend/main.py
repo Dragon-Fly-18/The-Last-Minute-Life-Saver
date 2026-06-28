@@ -194,3 +194,40 @@ def add_calendar_event(data: CalendarRequest):
         return {"error": f"Google Calendar API Error: {e.reason}"}
     except Exception as e:
         return {"error": f"An unexpected error occurred: {str(e)}"}
+
+
+# AI Productivity Score
+from productivity import calculate_productivity_score
+
+class ProductivityRequest(BaseModel):
+    tasks: list
+
+@app.post("/productivity")
+def get_productivity_analysis(data: ProductivityRequest):
+    stats = calculate_productivity_score(data.tasks)
+    
+    # Generate quick personalized AI coaching tip from Gemini
+    prompt = f"""You are a helpful and direct AI productivity coach. 
+Analyze the user's current task stats:
+- Productivity Score: {stats['score']}%
+- Completion Rate: {stats['completion_rate']}% ({stats['completed_tasks']}/{stats['total_tasks']} tasks completed)
+- High Priority Pending Tasks: {stats['high_priority_pending']}
+- Overdue Tasks: {stats['overdue_tasks']}
+
+Write a single-sentence, highly actionable and direct piece of advice/encouragement (under 25 words).
+Focus on what they should do next (e.g. tackle high priority tasks, address overdue ones, or celebrate if they are doing great).
+Do not be generic. Keep it short."""
+
+    try:
+        ai_tip = ask_gemini(prompt)
+        if not ai_tip or ai_tip.strip() == "":
+            ai_tip = "Keep up the momentum and focus on your high-priority items!"
+        else:
+            ai_tip = ai_tip.strip()
+    except Exception:
+        ai_tip = "Stay focused! Tackling high-priority tasks first will keep you on track."
+
+    return {
+        "stats": stats,
+        "ai_tip": ai_tip
+    }
